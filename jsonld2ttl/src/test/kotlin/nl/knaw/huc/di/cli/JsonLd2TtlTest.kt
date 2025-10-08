@@ -112,32 +112,36 @@ class JsonLd2TtlTest {
 
         @Test
         fun `add vocab to context if it doesn't exist`() {
-            val withVocabContext = addVocabContext(jsonld)
+            val (context, withVocabContext) = addVocabContext(jsonld)
             println(withVocabContext)
+            println(context)
             assert(withVocabContext.contains(vocabDef))
         }
 
         @Test
         fun `add vocab to simple context`() {
             val json = """{"@context":"http://example.com"}"""
-            val withVocabContext = addVocabContext(json)
+            val (context, withVocabContext) = addVocabContext(json)
             println(withVocabContext)
+            println(context)
             assert(withVocabContext.contains(vocabDef))
         }
 
         @Test
         fun `add vocab to context object`() {
             val json = """{"@context":{"e1": "http://example.com","e2":"http://example2.com"}}"""
-            val withVocabContext = addVocabContext(json)
+            val (context, withVocabContext) =  addVocabContext(json)
             println(withVocabContext)
+            println(context)
             assert(withVocabContext.contains(vocabDef))
         }
 
         @Test
         fun `add vocab to context array`() {
             val json = """{"@context":["http://example.com","http://example2.com","http://example3.com"]}"""
-            val withVocabContext = addVocabContext(json)
+            val (context, withVocabContext) =  addVocabContext(json)
             println(withVocabContext)
+            println(context)
             assert(withVocabContext.contains(vocabDef))
         }
 

@@ -53,16 +53,16 @@ object JsonLdTools {
         return result
     }
 
-    fun addVocabContext(jsonld: String): String {
+    fun addVocabContext(jsonld: String): Pair<List<Any>, String> {
         val json = JSONObject(jsonld)
         val contexts = when (val contextObject = json.opt("@context")) {
-            is JSONArray -> List(contextObject.length()) { i -> contextObject.get(i).toString() }
-            else -> listOf(contextObject.toString())
+            is JSONArray -> List(contextObject.length()) { i -> contextObject.get(i) }
+            else -> listOf(contextObject)
         }
-        if (contexts.none { it.contains("@vocab") }) {
+        if (contexts.none { it.toString().contains("@vocab") }) {
             json.put("@context", contexts + mapOf("@vocab" to "urn:uncontextualized:"))
         }
-        return json.toString(2)
+        return Pair(contexts, json.toString(2))
     }
 
     /** Follows redirects (up to 5 times) before returning the resolved URL. */
