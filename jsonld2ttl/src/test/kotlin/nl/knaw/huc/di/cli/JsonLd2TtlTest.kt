@@ -21,7 +21,7 @@ class JsonLd2TtlTest {
     val jsonld = """
             {
               "@context": "http://www.w3.org/ns/anno.jsonld",
-              "id": "urn:something",
+              "id": "urn:example:something",
               "type": "Annotation",
               "body": {
                 "type": "MyType",
@@ -36,22 +36,12 @@ class JsonLd2TtlTest {
 
     @Test
     fun `correctly convert valid jsonld`() {
-        val expected = """PREFIX :        <urn:uncontextualized:>
-PREFIX as:      <http://www.w3.org/ns/activitystreams#>
-PREFIX dc:      <http://purl.org/dc/elements/1.1/>
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX dctypes: <http://purl.org/dc/dcmitype/>
-PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
-PREFIX iana:    <http://www.iana.org/assignments/relation/>
-PREFIX oa:      <http://www.w3.org/ns/oa#>
-PREFIX owl:     <http://www.w3.org/2002/07/owl#>
-PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX schema:  <http://schema.org/>
-PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
-PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+        val expected = """PREFIX :    <urn:example:uncontextualized:>
+PREFIX oa:  <http://www.w3.org/ns/oa#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-<urn:something>  a  oa:Annotation;
+<urn:example:something>
+        a        oa:Annotation;
         oa:hasBody      [ a     :MyType;
                           rdf:value    "I like this page!";
                           :custom_url  "http://this-is-no-identifier.com";

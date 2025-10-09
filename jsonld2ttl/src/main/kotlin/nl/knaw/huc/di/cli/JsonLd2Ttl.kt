@@ -49,6 +49,7 @@ fun toTTL(jsonld: String): String =
         }
         RDFDataMgr.read(model, jsonldInputStream, "", Lang.JSONLD)
         val baos = ByteArrayOutputStream()
+
         val uncontextualized =
             model.listStatements().asSequence()
                 .flatMap { listOf(it.`object`, it.predicate, it.subject) }
@@ -60,6 +61,18 @@ fun toTTL(jsonld: String): String =
                 logger.warn { "- $it" }
             }
         }
+
+        val prefix2namespaceMap = mergedNsPrefixMap.map { it.value to it.key }.toMap()
+        val usedNamespaces = model.listStatements().asSequence()
+            .flatMap { listOf(it.`object`, it.predicate, it.subject) }
+            .map { it.toString() }
+            .toSet()
+            .mapNotNull { e -> prefix2namespaceMap.keys.firstOrNull { prefix -> e.startsWith(prefix) } }
+            .map { p -> prefix2namespaceMap[p] }
+            .toSet()
+        val unusedNamespaces = mergedNsPrefixMap.keys - usedNamespaces
+        unusedNamespaces.forEach { model.removeNsPrefix(it) }
+
         RDFDataMgr.write(baos, model, Lang.TURTLE)
         baos.toString()
             .replace(" rdf:type ", " a ")
