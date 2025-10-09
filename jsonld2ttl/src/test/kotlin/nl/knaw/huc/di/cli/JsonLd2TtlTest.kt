@@ -76,8 +76,8 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
         val jsonld = """
             {
-              "@context": ["http://www.w3.org/ns/anno.jsonld",{"@vocab":"urn:uncontextualized:"}],
-              "id": "urn:something",
+              "@context": "http://www.w3.org/ns/anno.jsonld"},
+              "id": "urn:example:something",
               "type": "Annotation",
               "body": {
                 "type": "MyType",
@@ -89,7 +89,7 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
               "mycustomfield": "my custom value"
             }
         """.trimMargin()
-        val vocabDef = """"@vocab": "urn:uncontextualized:"""
+        val vocabDef = """"@vocab": "$UNCONTEXTUALIZED_PREFIX"""
 
         @Test
         fun `add vocab to context if it doesn't exist`() {
