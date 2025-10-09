@@ -10,6 +10,8 @@ import org.apache.jena.riot.RDFDataMgr
 import org.json.JSONArray
 import org.json.JSONObject
 
+const val UNCONTEXTUALIZED_PREFIX = "urn:example:uncontextualized:"
+
 object JsonLdTools {
 
     /**
@@ -60,7 +62,7 @@ object JsonLdTools {
             else -> listOf(contextObject)
         }
         if (contexts.none { it.toString().contains("@vocab") }) {
-            json.put("@context", contexts + mapOf("@vocab" to "urn:uncontextualized:"))
+            json.put("@context", contexts + mapOf("@vocab" to UNCONTEXTUALIZED_PREFIX))
         }
         return Pair(contexts, json.toString(2))
     }
