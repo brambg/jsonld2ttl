@@ -14,8 +14,7 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
-
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("plugin.serialization") version "2.2.20"
 
     id("com.gradleup.shadow") version "9.2.2"
 }
@@ -38,6 +37,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
     implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation("org.json:json:20231013")
 
     // Use JUnit Jupiter for testing.

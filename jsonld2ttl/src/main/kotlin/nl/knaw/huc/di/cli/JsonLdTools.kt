@@ -2,17 +2,36 @@ package nl.knaw.huc.di.cli
 
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectory
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFDataMgr
+import org.apache.logging.log4j.kotlin.logger
 import org.json.JSONArray
 import org.json.JSONObject
 
 const val UNCONTEXTUALIZED_PREFIX = "urn:example:uncontextualized:"
+typealias NamespaceCache = MutableMap<String, Map<String, String>>
 
 object JsonLdTools {
+
+    val cachePath by lazy {
+        val cacheDirectory = Path(System.getProperty("user.home"), ".jsonld2ttl")
+        if (!cacheDirectory.isDirectory()) {
+            logger.debug { "creating $cacheDirectory" }
+            cacheDirectory.createDirectory()
+        }
+        Path(cacheDirectory.toString(), "namespaceCache.json")
+    }
+    val namespaceCache: NamespaceCache by lazy { loadNamespaceCache() }
 
     /**
      * Loads JSON-LD from a URL (follows redirects) and extracts namespace
@@ -20,14 +39,21 @@ object JsonLdTools {
      */
     suspend fun extractNamespaces(jsonLdUrl: String): Result<Map<String, String>> = runCatching {
         withContext(Dispatchers.IO) {
-            val finalUrl = followRedirects(jsonLdUrl)
-            val model = ModelFactory.createDefaultModel()
+            if (namespaceCache.containsKey(jsonLdUrl)) {
+                namespaceCache[jsonLdUrl]!!
+            } else {
+                val finalUrl = followRedirects(jsonLdUrl)
+                val model = ModelFactory.createDefaultModel()
 
-            finalUrl.openStream().use { input ->
-                RDFDataMgr.read(model, input, Lang.JSONLD)
+                finalUrl.openStream().use { input ->
+                    RDFDataMgr.read(model, input, Lang.JSONLD)
+                }
+
+                val prefixMap = model.nsPrefixMap
+                namespaceCache[jsonLdUrl] = prefixMap
+                storeNamespaceCache()
+                prefixMap
             }
-
-            model.nsPrefixMap
         }
     }
 
@@ -96,6 +122,21 @@ object JsonLdTools {
                 else -> return currentUrl
             }
         }
+    }
+
+    private fun loadNamespaceCache(): NamespaceCache {
+        if (cachePath.isRegularFile()) {
+            logger.debug { "reading $cachePath" }
+            val json = cachePath.readText()
+            return Json.decodeFromString<NamespaceCache>(json)
+        } else {
+            return mutableMapOf()
+        }
+    }
+
+    private fun storeNamespaceCache() {
+        logger.debug { "writing $cachePath" }
+        cachePath.writeText(Json.encodeToString(namespaceCache))
     }
 
 }
