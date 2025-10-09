@@ -4,11 +4,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlinx.coroutines.runBlocking
-import org.apache.jena.riot.Lang
-import org.apache.jena.riot.RDFDataMgr
-import org.apache.jena.riot.RDFLanguages
-import org.apache.jena.riot.RDFParser
-import org.apache.jena.riot.system.ErrorHandlerFactory
 import nl.knaw.huc.di.cli.JsonLdTools.addVocabContext
 import nl.knaw.huc.di.cli.JsonLdTools.extractNamespaces
 import nl.knaw.huc.di.cli.JsonLdTools.mergeMaps
