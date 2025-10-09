@@ -60,6 +60,8 @@ fun toTTL(jsonld: String): String =
             uncontextualized.sorted().forEach {
                 logger.warn { "- $it" }
             }
+        } else {
+            model.removeNsPrefix("")
         }
 
         val prefix2namespaceMap = mergedNsPrefixMap.map { it.value to it.key }.toMap()
