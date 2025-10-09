@@ -50,10 +50,13 @@ fun toTTL(jsonld: String): String =
         RDFDataMgr.read(model, jsonldInputStream, "", Lang.JSONLD)
         val baos = ByteArrayOutputStream()
 
+        val statementElementSet = model.listStatements().asSequence()
+            .flatMap { listOf(it.`object`, it.predicate, it.subject) }
+            .map { it.toString() }
+            .toSet()
         val uncontextualized =
-            model.listStatements().asSequence()
-                .flatMap { listOf(it.`object`, it.predicate, it.subject) }
-                .map { it.toString() }.toSet().filter { it.startsWith(UNCONTEXTUALIZED_PREFIX) }
+            statementElementSet
+                .filter { it.startsWith(UNCONTEXTUALIZED_PREFIX) }
                 .map { it.substringAfter(UNCONTEXTUALIZED_PREFIX) }
         if (uncontextualized.isNotEmpty()) {
             logger.warn { "Uncontextualized elements found:" }
@@ -65,10 +68,7 @@ fun toTTL(jsonld: String): String =
         }
 
         val prefix2namespaceMap = mergedNsPrefixMap.map { it.value to it.key }.toMap()
-        val usedNamespaces = model.listStatements().asSequence()
-            .flatMap { listOf(it.`object`, it.predicate, it.subject) }
-            .map { it.toString() }
-            .toSet()
+        val usedNamespaces = statementElementSet
             .mapNotNull { e -> prefix2namespaceMap.keys.firstOrNull { prefix -> e.startsWith(prefix) } }
             .map { p -> prefix2namespaceMap[p] }
             .toSet()
