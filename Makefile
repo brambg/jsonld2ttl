@@ -8,6 +8,7 @@ NEWER_SOURCE_FILES=$(shell find jsonld2ttl/src/main -newer $(SHADOW_JAR) -type f
 
 ~/bin/jsonld2ttl: ~/bin/ ./jsonld2ttl/src/main/bash/jsonld2ttl.sh ~/libs/jsonld2ttl.jar
 	cp -a ./jsonld2ttl/src/main/bash/jsonld2ttl.sh ~/bin/jsonld2ttl
+	@touch $@
 
 ~/libs:
 	mkdir -p ~/libs
