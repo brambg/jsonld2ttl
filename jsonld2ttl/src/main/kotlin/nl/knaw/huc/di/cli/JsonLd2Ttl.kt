@@ -58,10 +58,7 @@ fun toTTL(jsonld: String): String =
                 .filter { it.startsWith(UNCONTEXTUALIZED_PREFIX) }
                 .map { it.substringAfter(UNCONTEXTUALIZED_PREFIX) }
         if (uncontextualized.isNotEmpty()) {
-            logger.warn { "Uncontextualized elements found:" }
-            uncontextualized.sorted().forEach {
-                logger.warn { "- $it" }
-            }
+            logger.warn { "Uncontextualized elements found:\n  ${uncontextualized.sorted().joinToString("\n  ")}" }
         } else {
             model.removeNsPrefix("")
         }
