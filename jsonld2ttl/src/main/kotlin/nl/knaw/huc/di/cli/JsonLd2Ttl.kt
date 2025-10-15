@@ -7,6 +7,8 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.ExperimentalCli
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFDataMgr
@@ -29,10 +31,20 @@ fun main(args: Array<String>) {
     println(ttl)
 }
 
+val anno_context = readAnnoContext()
+
+fun readAnnoContext(): String {
+    val json = Path("/Users/bram/.context_cache/anno.jsonld").readText()
+    val map = Json.decodeFromString<Map<String, JsonObject>>(json)
+    return Json.encodeToString(map["@context"])
+}
+
 fun toTTL(jsonld: String): String =
     runBlocking {
         val (enhancedContext, jsonLdWithVocabContext) = addVocabContext(jsonld)
-        val jsonldInputStream = jsonLdWithVocabContext.byteInputStream()
+        val withAnnoContextInserted =
+            jsonLdWithVocabContext.replace("\"http://www.w3.org/ns/anno.jsonld\"", anno_context)
+        val jsonldInputStream = withAnnoContextInserted.byteInputStream()
 
         val mergedNsPrefixMap = enhancedContext.filter { it is String }
             .map { extractNamespaces(it as String) }
